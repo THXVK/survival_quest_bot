@@ -1,21 +1,17 @@
 import telebot
 from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from telebot import types
 from dotenv import load_dotenv
 from os import getenv
 from data import user_load, user_save, locations_load
-
+from game import up_time
 
 load_dotenv()
 token = getenv('TOKEN')
 bot = telebot.TeleBot(token=token)
 
 
-
-
-
 actions_markup = InlineKeyboardMarkup()
-button_1 = InlineKeyboardButton('смена локации',callback_data='change_location')
+button_1 = InlineKeyboardButton('смена локации', callback_data='change_location')
 button_2 = InlineKeyboardButton('спать', callback_data='sleep')
 button_3 = InlineKeyboardButton('открыть инвентарь', callback_data='show_inv')
 
@@ -23,9 +19,8 @@ button_3 = InlineKeyboardButton('открыть инвентарь', callback_da
 actions_markup.add(button_1, button_2, button_3, row_width=1)
 
 
-
 @bot.message_handler(commands=['start'])
-def start(message):
+def start(message: Message) -> None:
     """
     Функция отправки сообщения в ответ на /start
 
@@ -39,6 +34,7 @@ def start(message):
     if user_id not in users:
         users[user_id] = {
             'location': 'начало',
+            'time': {'hrs': 0, 'mins': 0, 'days_num': 1}
         }
         user_save(users)
 
@@ -46,16 +42,23 @@ def start(message):
     game_actions(message.chat.id)
 
 
-def game_actions(m_id):
+def game_actions(m_id) -> None:
+    users = user_load()
+    user_id = str(m_id)
 
     #  todo: сообщения с временем и состоянием
 
+    txt = f"""день {users[user_id]['time']["days_num"]},     
+время:  {users[user_id]['time']['hrs']:02}:{users[user_id]['time']['mins']:02}
+состояние: 
+"""
+
+    bot.send_message(m_id, text=txt)
     bot.send_message(m_id, text='выберите действие', reply_markup=actions_markup)
 
 
-
 @bot.callback_query_handler(func=lambda call: call.data == 'change_location')
-def change_location(call):
+def change_location(call) -> None:
     m_id = call.message.chat.id
     user_id = str(m_id)
     users = user_load()
@@ -75,13 +78,39 @@ def change_location(call):
 
 
 @bot.callback_query_handler(func=lambda call: call.data in locations_load())
-def change_location(call):
+def change_location(call) -> None:
     m_id = call.message.chat.id
+
+    locations = locations_load()
+    new_loc = call.data
+
     user_id = str(m_id)
     users = user_load()
-    users[user_id]['location'] = call.data
+    users[user_id]['location'] = new_loc
+
+    up_time(user_id, locations[new_loc]['time_to_move'])
+
     bot.send_message(m_id, text=f'сейчас вы находитесь в локации "{users[user_id]["location"]}"')
     game_actions(m_id)
+
+
+
+
+
+
+
+
+
+
+
+@bot.message_handler(content_types=['text'])
+def echo(message: Message) -> None:
+    """Функция ответа на некорректное сообщение от пользователя
+
+    Функция отправляет сообщение с некорректным ответом от пользователя в формате
+    'Вы напечатали: *сообщение пользователя*.что?'
+    :param message: некорректное сообщение пользователя"""
+    bot.send_message(chat_id=message.chat.id, text=f'Вы напечатали: {message.text}. Что?')
 
 
 bot.polling()
