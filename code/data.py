@@ -3,6 +3,10 @@ import json
 filename_1 = '../data/users_data.json'
 
 
+# todo: статы предметов и их механики
+# todo: инфа о локациях, картинки
+# todo: инфа о врагах, их статы
+
 def user_load() -> dict:
     try:
         with open(filename_1, 'r', encoding='utf-8') as file:

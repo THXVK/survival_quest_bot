@@ -3,8 +3,6 @@ import time
 from data import user_load, user_save, locations_load
 
 
-# todo: механика времени
-
 def up_time(user_id: str, time_to: list):
     users = user_load()
     # time_to: [0] - hrs, [1] - mins
@@ -22,7 +20,8 @@ def up_time(user_id: str, time_to: list):
     user_save(users)
 
 
-
-# todo: механика состояния
+# todo: механика состояний
+# todo: механика сна
+# todo: концовки игры
 # todo: инвентарь
 # todo: механика боя

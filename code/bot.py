@@ -94,13 +94,7 @@ def change_location(call) -> None:
     game_actions(m_id)
 
 
-
-
-
-
-
-
-
+#  todo: коллбек хендлеры - обработчики действий из game_actions
 
 
 @bot.message_handler(content_types=['text'])
