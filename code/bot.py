@@ -3,7 +3,7 @@ from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
 from os import getenv
 from data import user_load, user_save, locations_load
-from game import up_time
+from game import up_time, new_temperature, check_status
 
 load_dotenv()
 token = getenv('TOKEN')
@@ -14,9 +14,10 @@ actions_markup = InlineKeyboardMarkup()
 button_1 = InlineKeyboardButton('смена локации', callback_data='change_location')
 button_2 = InlineKeyboardButton('спать', callback_data='sleep')
 button_3 = InlineKeyboardButton('открыть инвентарь', callback_data='show_inv')
+button_4 = InlineKeyboardButton('исследовать локацию', callback_data='scouting')
 
 
-actions_markup.add(button_1, button_2, button_3, row_width=1)
+actions_markup.add(button_1, button_2, button_3, button_4,  row_width=1)
 
 
 @bot.message_handler(commands=['start'])
@@ -34,7 +35,18 @@ def start(message: Message) -> None:
     if user_id not in users:
         users[user_id] = {
             'location': 'начало',
-            'time': {'hrs': 0, 'mins': 0, 'days_num': 1}
+            'time': {'hrs': 0, 'mins': 0, 'days_num': 1},
+            'temp': {'self_temp': 36.6,
+                     'world_temp': -20.0
+                     },
+            'equipment': {'head': ['naked'],
+                          'body': ['naked'],
+                          'legs': ['naked'],
+                          'feet': ['socks']
+                          },
+            'state': {'в норме': 1},
+            'status': 'жив',
+            'temperature': -20.0
         }
         user_save(users)
 
@@ -46,11 +58,11 @@ def game_actions(m_id) -> None:
     users = user_load()
     user_id = str(m_id)
 
-    #  todo: сообщения с временем и состоянием
-
     txt = f"""день {users[user_id]['time']["days_num"]},     
 время:  {users[user_id]['time']['hrs']:02}:{users[user_id]['time']['mins']:02}
-состояние: 
+состояние: {users[user_id]['state'].keys()}
+статус: {users[user_id]['status']}
+температура: {users[user_id]['temperature']}
 """
 
     bot.send_message(m_id, text=txt)

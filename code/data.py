@@ -30,3 +30,23 @@ def locations_load():
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
+filename_3 = '../data/items_data.json'
+
+
+def items_load():
+    try:
+        with open(filename_3, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+filename_4 = '../data/states_data.json'
+
+
+def states_load():
+    try:
+        with open(filename_4, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
