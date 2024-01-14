@@ -30,6 +30,7 @@ def locations_load():
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
+
 filename_3 = '../data/items_data.json'
 
 

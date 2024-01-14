@@ -1,11 +1,12 @@
 {
-"гипертония": {
-  "max_sate_streak": 2,
-  "effect_1": "смерть",
-  "effect_2": null
-},
-"в норме": {
-  "max_sate_streak": null,
-  "effect_1": "жив",
-  "effect_2": null
+  "гипотермия": {
+    "max_state_streak": 2,
+    "effect_1": "смерть",
+    "effect_2": null
+  },
+  "в норме": {
+    "max_state_streak": null,
+    "effect_1": "жив",
+    "effect_2": null
+  }
 }

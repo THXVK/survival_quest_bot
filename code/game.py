@@ -40,7 +40,7 @@ def new_temperature(user_id):
         koef_equip = 1
         for i in equip:
             item = items[i]['item_temp_koef']
-            koef_equip += item
+            koef_equip *= item
         return koef_equip
 
     koef_head = count_koef(equiped_head)
@@ -55,28 +55,46 @@ def new_temperature(user_id):
 
     users[user_id]['temperature'] = total_world_temp
 
-    if total_temp > 10:
-        user_save(users)
-    elif 10 < total_temp < 20:
+    if total_temp > 0:
+
+        pass
+    elif total_temp < 10:
         if 'гипотермия' not in users[user_id]['state']:
             users[user_id]['state']['гипотермия'] = 0
-        elif 'гипотермия' in users[user_id]['state']:
+            print('a1')
+        else:
             check_status(user_id, 'гипотермия')
-
+            print('b1')
+    else:
+        users[user_id]['state']['гипотермия'] = 2
+        check_status(user_id, 'гипотермия')
+        print('c1')
+    user_save(users)
 
 
 def check_status(user_id, state):
     users = user_load()
     states = states_load()
-    if users[user_id]['state'][state] == states[state]['max_sate_streak']:
+
+    if users[user_id]['state'][state] == states[state]['max_state_streak']:
         users[user_id]['status'] = states[state]['effect_1']
         users[user_id]['state'][states[state]['effect_2']] = 0
-        users[user_id]['state'].remove(state)
+        users[user_id]['state'].pop(state)
+        print('a')
+
     else:
         users[user_id]['state'][state] += 1
+        print(users[user_id]['state'][state])
+        print('b')
+
+    if len(users[user_id]['state']) > 1 and users[user_id]['state']['в норме'] in users[user_id]['state']:
+        users[user_id]['state'].pop('в норме')
+        print('c')
+
+    if len(users[user_id]['state']) == 0:
+        users[user_id]['state']['в норме'] = 0
+        print('v')
     user_save(users)
-
-
 
 # todo: механика состояний
 # todo: механика сна

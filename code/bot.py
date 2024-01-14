@@ -37,7 +37,7 @@ def start(message: Message) -> None:
             'location': 'начало',
             'time': {'hrs': 0, 'mins': 0, 'days_num': 1},
             'temp': {'self_temp': 36.6,
-                     'world_temp': -20.0
+                     'world_temp': -30.0
                      },
             'equipment': {'head': ['naked'],
                           'body': ['naked'],
