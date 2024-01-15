@@ -56,20 +56,23 @@ def new_temperature(user_id):
     users[user_id]['temperature'] = total_world_temp
 
     if total_temp > 0:
-
         pass
     elif total_temp < 10:
+        try:
+            users[user_id]['state'].pop('в норме')
+        except KeyError:
+            pass
         if 'гипотермия' not in users[user_id]['state']:
             users[user_id]['state']['гипотермия'] = 0
-            print('a1')
+
+            user_save(users)
         else:
             check_status(user_id, 'гипотермия')
-            print('b1')
+
     else:
         users[user_id]['state']['гипотермия'] = 2
+
         check_status(user_id, 'гипотермия')
-        print('c1')
-    user_save(users)
 
 
 def check_status(user_id, state):
@@ -80,21 +83,13 @@ def check_status(user_id, state):
         users[user_id]['status'] = states[state]['effect_1']
         users[user_id]['state'][states[state]['effect_2']] = 0
         users[user_id]['state'].pop(state)
-        print('a')
-
     else:
         users[user_id]['state'][state] += 1
-        print(users[user_id]['state'][state])
-        print('b')
 
-    if len(users[user_id]['state']) > 1 and users[user_id]['state']['в норме'] in users[user_id]['state']:
-        users[user_id]['state'].pop('в норме')
-        print('c')
-
-    if len(users[user_id]['state']) == 0:
+    if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
         users[user_id]['state']['в норме'] = 0
-        print('v')
     user_save(users)
+
 
 # todo: механика состояний
 # todo: механика сна

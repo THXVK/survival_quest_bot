@@ -1,12 +1,12 @@
 {
   "гипотермия": {
     "max_state_streak": 2,
-    "effect_1": "смерть",
-    "effect_2": null
+    "effect_1": "мертв",
+    "effect_2": ""
   },
   "в норме": {
     "max_state_streak": null,
     "effect_1": "жив",
-    "effect_2": null
+    "effect_2": ""
   }
 }

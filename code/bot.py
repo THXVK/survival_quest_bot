@@ -58,15 +58,48 @@ def game_actions(m_id) -> None:
     users = user_load()
     user_id = str(m_id)
 
+    state_list = ', '.join(list(users[user_id]['state'].keys()))
     txt = f"""день {users[user_id]['time']["days_num"]},     
 время:  {users[user_id]['time']['hrs']:02}:{users[user_id]['time']['mins']:02}
-состояние: {users[user_id]['state'].keys()}
+состояние: {state_list[:]}
 статус: {users[user_id]['status']}
 температура: {users[user_id]['temperature']}
 """
 
     bot.send_message(m_id, text=txt)
-    bot.send_message(m_id, text='выберите действие', reply_markup=actions_markup)
+    if users[user_id]['status'] == 'мертв':
+        bot.send_message(m_id, text='вы погибли, для начала новой игры используйте /restart')
+    else:
+        bot.send_message(m_id, text='выберите действие', reply_markup=actions_markup)
+
+
+@bot.message_handler(commands=['restart'])
+def restart(message: Message) -> None:
+
+    users = user_load()
+    user_id = str(message.chat.id)
+
+    if user_id in users:
+        users[user_id] = {
+            'location': 'начало',
+            'time': {'hrs': 0, 'mins': 0, 'days_num': 1},
+            'temp': {'self_temp': 36.6,
+                     'world_temp': -30.0
+                     },
+            'equipment': {'head': ['naked'],
+                          'body': ['naked'],
+                          'legs': ['naked'],
+                          'feet': ['socks']
+                          },
+            'state': {'в норме': 1},
+            'status': 'жив',
+            'temperature': -20.0
+        }
+        user_save(users)
+        bot.send_message(chat_id=message.chat.id, text='новая попытка, gl hf!')
+        game_actions(message.chat.id)
+    else:
+        bot.send_message(chat_id=message.chat.id, text='у вас еще нет начатой игры чтобы использовать эту команду. Чтобы начать, используйте /start')
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'change_location')
@@ -91,7 +124,12 @@ def change_location(call) -> None:
 
 @bot.callback_query_handler(func=lambda call: call.data in locations_load())
 def change_location(call) -> None:
+
     m_id = call.message.chat.id
+
+    i = 1
+    txt = 'подождите' + '.' * i
+    loading_message = bot.send_message(m_id, text=txt)
 
     locations = locations_load()
     new_loc = call.data
@@ -100,11 +138,19 @@ def change_location(call) -> None:
     users = user_load()
     users[user_id]['location'] = new_loc
 
+    i = 2
+    txt = 'подождите' + '.' * i
+    bot.edit_message_text(chat_id=loading_message.chat.id, message_id=loading_message.id, text=txt)
+
     up_time(user_id, locations[new_loc]['time_to_move'])
+
+    i = 3
+    txt = 'подождите' + '.' * i
+    bot.edit_message_text(chat_id=loading_message.chat.id, message_id=loading_message.id, text=txt)
+    bot.delete_message(m_id, loading_message.id)
 
     bot.send_message(m_id, text=f'сейчас вы находитесь в локации "{users[user_id]["location"]}"')
     game_actions(m_id)
-
 
 #  todo: коллбек хендлеры - обработчики действий из game_actions
 
