@@ -39,7 +39,7 @@ def new_temperature(user_id):
     def count_koef(equip):
         koef_equip = 1
         for i in equip:
-            item = items[i]['item_temp_koef']
+            item = items['clothes'][i]['item_temp_koef']
             koef_equip *= item
         return koef_equip
 

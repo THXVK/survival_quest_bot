@@ -1,12 +1,15 @@
 {
-  "naked": {
-    "name": "нет",
-    "weight": 0,
-    "item_temp_koef": 0.8
-  },
-  "socks": {
-    "name": "носки",
-    "weight": 0.1,
-    "item_temp_koef": 1.1
+  "clothes":
+  {
+    "naked": {
+      "name": "нет",
+      "weight": 0,
+      "item_temp_koef": 0.8
+    },
+    "socks": {
+      "name": "носки",
+      "weight": 0.1,
+      "item_temp_koef": 1.1
+    }
   }
 }

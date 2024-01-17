@@ -3,7 +3,7 @@ from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
 from os import getenv
 from data import user_load, user_save, locations_load
-from game import up_time, new_temperature, check_status
+from game import up_time
 
 load_dotenv()
 token = getenv('TOKEN')
@@ -44,6 +44,7 @@ def start(message: Message) -> None:
                           'legs': ['naked'],
                           'feet': ['socks']
                           },
+            'inv': ['ukkt,', 'глеб', 'глоб'],
             'state': {'в норме': 1},
             'status': 'жив',
             'temperature': -20.0
@@ -91,6 +92,7 @@ def restart(message: Message) -> None:
                           'legs': ['naked'],
                           'feet': ['socks']
                           },
+            'inv': ['ukkt,', 'глеб', 'глоб'],
             'state': {'в норме': 1},
             'status': 'жив',
             'temperature': -20.0
@@ -120,6 +122,83 @@ def change_location(call) -> None:
         ways_markup.add(button, row_width=list_len)
 
     bot.send_message(chat_id=m_id, text='куда вы хотите пройти?', reply_markup=ways_markup)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith('inv'))
+def inv(call) -> None:
+    m_id = call.message.chat.id
+    user_id = str(m_id)
+    users = user_load()
+
+    pages_list = users[user_id]['inv']
+    pages_num = len(users[user_id]['inv'])
+    page = 0
+    cur_page = page + 1
+    inv_markup = InlineKeyboardMarkup()
+    button_1_2 = InlineKeyboardButton('<-', callback_data=f'forward_{page}_{pages_num}_nav')
+    button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+    button_1_3 = InlineKeyboardButton('->', callback_data=f'back_{page}_{pages_num}_nav')
+    button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
+    inv_markup.add(button_1_1)
+    inv_markup.add(button_1_2, button_1_4, button_1_3)
+
+    bot.send_message(chat_id=m_id, text=pages_list[page], reply_markup=inv_markup)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith('nav'))
+def inv_navigation(call) -> None:
+    req = call.data.split('_')
+    m_id = call.message.chat.id
+    user_id = str(m_id)
+    users = user_load()
+
+    pages_list = users[user_id]['inv']
+    page = int(req[1])
+    pages_num = int(req[2])
+
+    if req[0] == 'unseen':
+        try:
+            bot.delete_message(m_id, call.message.message_id)
+        except TimeoutError:
+            pass
+
+    elif req[0] == 'forward':
+        page += 1
+        if page == pages_num:
+            page = 0
+    elif req[0] == 'back':
+        page -= 1
+        if page < 0:
+            page = pages_num - 1
+    cur_page = page + 1
+
+    inv_markup = InlineKeyboardMarkup()
+    button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
+    button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+    button_1_3 = InlineKeyboardButton('->', callback_data=f'forward_{page}_{pages_num}_nav')
+    button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
+    inv_markup.add(button_1_1)
+    inv_markup.add(button_1_2, button_1_4, button_1_3)
+    try:
+        bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
+                        text=pages_list[page], reply_markup=inv_markup)
+    except Exception:
+        pass
+
+
+@bot.callback_query_handler(func=lambda call: call.data == 'sleep')
+def sleep(call) -> None:
+    m_id = call.message.chat.id
+    user_id = str(m_id)
+    users = user_load()
+
+    bot.answer_callback_query(call.id, text='введите время сна (максимум - 10 часов')
+
+
+
+
+
+
 
 
 @bot.callback_query_handler(func=lambda call: call.data in locations_load())
