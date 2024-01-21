@@ -50,11 +50,11 @@ def new_temperature(user_id):
 
     sum_koef = koef_head * koef_body * koef_legs * koef_feet
     user_total_temp = users[user_id]['temp']['self_temp'] * sum_koef
-    total_world_temp = random_temp + locations[users[user_id]['location']]['loc_temp'] + users[user_id]['temp']['world_temp']
+    total_world_temp = (random_temp +
+                        locations[users[user_id]['location']]['loc_temp'] + users[user_id]['temp']['world_temp'])
     total_temp = user_total_temp + total_world_temp
 
     users[user_id]['temperature'] = total_world_temp
-
     if total_temp > 0:
         pass
     elif total_temp < 10:
@@ -75,21 +75,24 @@ def new_temperature(user_id):
         check_status(user_id, 'гипотермия')
 
 
-def check_status(user_id, state):
+def check_status(self, user_id):
     users = user_load()
     states = states_load()
 
-    if users[user_id]['state'][state] == states[state]['max_state_streak']:
-        users[user_id]['status'] = states[state]['effect_1']
-        users[user_id]['state'][states[state]['effect_2']] = 0
-        users[user_id]['state'].pop(state)
+    if users[user_id]['state'][self] == states[self]['max_state_streak']:
+        users[user_id]['status'] = states[self]['effect_1']
+        users[user_id]['state'][states[self]['effect_2']] = 0
+        users[user_id]['state'].pop(self)
     else:
-        users[user_id]['state'][state] += 1
+        users[user_id]['state'][self] += 1
 
     if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
         users[user_id]['state']['в норме'] = 0
     user_save(users)
 
+
+def check_tired_state():
+    pass
 
 # todo: механика состояний
 # todo: механика сна

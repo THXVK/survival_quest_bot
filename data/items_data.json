@@ -1,6 +1,5 @@
 {
-  "clothes":
-  {
+  "clothes": {
     "naked": {
       "name": "нет",
       "weight": 0,
@@ -10,6 +9,83 @@
       "name": "носки",
       "weight": 0.1,
       "item_temp_koef": 1.1
+    },
+    "ботинок нет": {
+      "name": "ботинок нет",
+      "weight": 0,
+      "durability": 99999,
+      "item_temp_koef": 0.8,
+      "body_part": "feet"
+    },
+    "подштанники": {
+      "name": "подштанники",
+      "weight": 1.2,
+      "durability": 100,
+      "item_temp_koef": 1.3,
+      "body_part": "legs"
+    },
+    "шапка": {
+      "name": "шапка",
+      "weight": 0.4,
+      "durability": 80,
+      "item_temp_koef": 1.0,
+      "body_part": "head"
+    },
+    "ботинки": {
+      "name": "ботинки",
+      "weight": 1.1,
+      "durability": 50,
+      "item_temp_koef": 1.2,
+      "body_part": "feet"
+    },
+    "шапки нет": {
+      "name": "шапки нет",
+      "weight": 0,
+      "durability": 99999,
+      "item_temp_koef": 0.8,
+      "body_part": "head"
+    },
+    "курток нет": {
+      "name": "курток нет",
+      "weight": 0,
+      "durability": 99999,
+      "item_temp_koef": 0.8,
+      "body_part": "body"
+    },
+    "куртка": {
+      "name": "куртка",
+      "weight": 3.0,
+      "durability": 100,
+      "item_temp_koef": 1.3,
+      "body_part": "body"
+    },
+    "штанов нет": {
+      "name": "штанов нет",
+      "weight": 0,
+      "durability": 99999,
+      "item_temp_koef": 0.8,
+      "body_part": "legs"
+    },
+    "джинсы": {
+      "name": "джинсы",
+      "weight": 1.5,
+      "durability": 70,
+      "item_temp_koef": 1.2,
+      "body_part": "legs"
+    },
+    "носки": {
+      "name": "носки",
+      "weight": 0.1,
+      "durability": 50,
+      "item_temp_koef": 0.9,
+      "body_part": "feet"
+    },
+    "трусы": {
+      "name": "трусы",
+      "weight": 0.2,
+      "durability": 150,
+      "item_temp_koef": 0.9,
+      "body_part": "legs"
     }
   }
 }
