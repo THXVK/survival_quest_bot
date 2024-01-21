@@ -2,11 +2,40 @@
   "гипотермия": {
     "max_state_streak": 2,
     "effect_1": "мертв",
-    "effect_2": ""
+    "effect_2": "в норме"
   },
   "в норме": {
     "max_state_streak": null,
     "effect_1": "жив",
-    "effect_2": ""
-  }
+    "effect_2": "в норме"
+  },
+  "усталость": {
+    "max_state_streak": 2,
+    "effect_1": "жив",
+    "effect_2": "истощение"},
+
+  "истощение": {
+    "max_state_streak": 2,
+    "effect_1": "мертв",
+    "effect_2": "в норме"},
+
+  "голод": {
+    "max_state_streak": 3,
+    "effect_1": "жив",
+    "effect_2": "сильный голод"},
+
+  "сильный голод": {
+    "max_state_streak": 2,
+    "effect_1": "мертв",
+    "effect_2": "в норме"},
+
+  "жажда": {
+    "max_state_streak": 2,
+    "effect_1": "жив",
+    "effect_2": "обезвоживание"},
+
+  "обезвоживание": {
+    "max_state_streak": 1,
+    "effect_1": "мертв",
+    "effect_2": "в норме"}
 }

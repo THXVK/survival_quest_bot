@@ -113,10 +113,19 @@ class ClothesClass(ItemsClass):
         return True
 
 
-naked_head = ClothesClass('шапки нет', 0, 99999, 0.8, 'head')
-naked_body = ClothesClass('курток нет', 0, 99999, 0.8,  'body')
-naked_legs = ClothesClass('штанов нет', 0, 99999, 0.8,  'legs')
-naked_feet = ClothesClass('ботинок нет', 0, 99999, 0.8,  'feet')
+class FoodClass(ItemsClass):
+    def __init__(self, name, weight, durability, food_koef):
+        super().__init__(name, weight, durability)
+        self.food_koef = food_koef
+
+    def use(self, user_id):
+        users = user_load()
+
+
+naked_head = ClothesClass('шапки нет', 0, 0, 0.8, 'head')
+naked_body = ClothesClass('курток нет', 0, 0, 0.8,  'body')
+naked_legs = ClothesClass('штанов нет', 0, 0, 0.8,  'legs')
+naked_feet = ClothesClass('ботинок нет', 0, 0, 0.8,  'feet')
 
 cap = ClothesClass('шапка', 0.4, 80, 1.0, 'head')
 coat = ClothesClass('куртка', 3.0, 100, 1.3, 'body')
@@ -132,12 +141,12 @@ items_list = [cap.name, coat.name, jeans.name, underpants.name, underpants.name,
 wood = LocationsClass('лес', ["темный лес", "магазин", "конец города"], [5, 0], "Лес. Здесь довольно холодно", -5.2, [])
 darker_wood = LocationsClass('темный лес', ["лес", "черный лес"], [10, 0], "Темный лес. Здесь даже холоднее", -10.7, [])
 darkest_wood = LocationsClass('черный лес', ["темный лес", "конец"], [5, 0], "Черный лес. Дальше носа не видно, пора разворачиваться ", -15.9, [])
-beginning = LocationsClass('дом', ['руины', 'здания', 'девятый район'], [0, 30], 'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, [])
+beginning = LocationsClass('дом', ['руины', 'здания', 'девятый район'], [0, 30], 'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, ['шапка', 'джинсы', 'трусы', 'ботинки'])
 buildings = LocationsClass('здания', ['дом', 'руины', 'девятый район', 'дорога'], [1, 0], 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6, [])
 road = LocationsClass('дорога', ['здания', '*табличку занесло снегом*'], [7, 0], 'Одна из немногих дорог из города, путь кажется вам знакомым. Деревня? Идти придется долго, да и холодно здесь', -8.1, [])
 village = LocationsClass('деревня', ['дорога'], [7, 0], 'Маленькая деревушка. Когда-то вы здесь жили', -3.2, [])
 
-beginning.loot_generation()
+
 buildings.loot_generation()
 village.loot_generation()
 

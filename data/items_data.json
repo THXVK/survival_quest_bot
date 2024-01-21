@@ -1,19 +1,9 @@
 {
   "clothes": {
-    "naked": {
-      "name": "нет",
-      "weight": 0,
-      "item_temp_koef": 0.8
-    },
-    "socks": {
-      "name": "носки",
-      "weight": 0.1,
-      "item_temp_koef": 1.1
-    },
     "ботинок нет": {
       "name": "ботинок нет",
       "weight": 0,
-      "durability": 99999,
+      "durability": 0,
       "item_temp_koef": 0.8,
       "body_part": "feet"
     },
@@ -41,14 +31,14 @@
     "шапки нет": {
       "name": "шапки нет",
       "weight": 0,
-      "durability": 99999,
+      "durability": 0,
       "item_temp_koef": 0.8,
       "body_part": "head"
     },
     "курток нет": {
       "name": "курток нет",
       "weight": 0,
-      "durability": 99999,
+      "durability": 0,
       "item_temp_koef": 0.8,
       "body_part": "body"
     },
@@ -62,7 +52,7 @@
     "штанов нет": {
       "name": "штанов нет",
       "weight": 0,
-      "durability": 99999,
+      "durability": 0,
       "item_temp_koef": 0.8,
       "body_part": "legs"
     },
