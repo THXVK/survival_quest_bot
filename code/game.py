@@ -1,5 +1,5 @@
 import random
-from data import user_load, user_save, locations_load, items_load, states_load
+from data import user_load, user_save, locations_load, items_load, states_load, get_name
 
 
 def up_time(user_id: str, time_to: list):
@@ -10,17 +10,40 @@ def up_time(user_id: str, time_to: list):
     mins_num = users[user_id]['time']['mins'] + time_to[1]
     days_num = users[user_id]['time']['days_num']
 
-    check_stt(user_id, time_to[0], time_to[1])
+    users[user_id]['stt']['стамина']['num'] -= (4 * time_to[0])
+    users[user_id]['stt']['стамина']['num'] -= (0.7 * time_to[1])
+
+    users[user_id]['stt']["сытость"]['num'] -= (3 * time_to[0])
+    users[user_id]['stt']["сытость"]['num'] -= (0.3 * time_to[1])
+
+    users[user_id]['stt']["жажда"]['num'] -= (5 * time_to[0])
+    users[user_id]['stt']["жажда"]['num'] -= (0.5 * time_to[1])
+
+    for stt in users[user_id]['stt']:
+        param = users[user_id]['stt'][stt]['num']
+        if param > 25:
+            state_1 = users[user_id]['stt'][stt]['rel_states']
+
+            users[user_id]['state'][state_1]['is_true'] = False
+            users[user_id]['state'][state_1]['streak'] = 0
+
+        else:
+            state = users[user_id]['stt'][stt]['rel_states']
+            users[user_id]['state'][state]['is_true'] = True
 
     for i in range(time_to[0]):
-        for body_part in users[user_id]['equipment'].keys():
-            for item in users[user_id]['equipment'][body_part]:
+        for body_part in list(users[user_id]['equipment']):
+            for item in list(users[user_id]['equipment'][body_part]):
                 if item.endswith('нет'):
                     users[user_id]['equipment'][body_part][item] += 1
                 else:
                     users[user_id]['equipment'][body_part][item] -= 1
-                    if users[user_id]['equipment'][body_part][item] < 0:
-                        users[user_id]['equipment'][body_part].remove(item)
+                    if users[user_id]['equipment'][body_part][item] <= 0:
+                        users[user_id]['equipment'][body_part].pop(item)
+
+                    if len(users[user_id]['equipment'][body_part]) == 0:
+                        naked_name = get_name(body_part)
+                        users[user_id]['equipment'][body_part][naked_name.name] = 0
 
     if mins_num >= 60:
         mins_num -= 60
@@ -45,15 +68,11 @@ def new_temperature(user_id):
     users = user_load()
     items = items_load()
     locations = locations_load()
-    random_temp = random.randrange(-50, 0) / 10
+    random_temp = random.randrange(-30, 0) / 10
 
     if users[user_id]['time']['days_num'] in [5, 10, 20, 25, 27]:
         users[user_id]['temp']['world_temp'] -= 5.0
 
-    equiped_head = users[user_id]['equipment']['head']
-    equiped_body = users[user_id]['equipment']['body']
-    equiped_legs = users[user_id]['equipment']['legs']
-    equiped_feet = users[user_id]['equipment']['feet']
 
     def count_koef(equip):
         koef_equip = 1
@@ -61,6 +80,11 @@ def new_temperature(user_id):
             item = items['clothes'][i]['item_temp_koef']
             koef_equip *= item
         return koef_equip
+
+    equiped_head = users[user_id]['equipment']['head']
+    equiped_body = users[user_id]['equipment']['body']
+    equiped_legs = users[user_id]['equipment']['legs']
+    equiped_feet = users[user_id]['equipment']['feet']
 
     koef_head = count_koef(equiped_head)
     koef_body = count_koef(equiped_body)
@@ -73,24 +97,16 @@ def new_temperature(user_id):
                         locations[users[user_id]['location']]['loc_temp'] + users[user_id]['temp']['world_temp'])
     total_temp = user_total_temp + total_world_temp
     users[user_id]['temperature'] = total_world_temp
-    if total_temp > 0:
+
+    if total_temp > 5:
         pass
-    elif total_temp < 10:
-        try:
-            users[user_id]['state']['в норме']['is_true'] = False
-        except KeyError:
-            pass
-        if not users[user_id]['state']['гипотермия']:
-            users[user_id]['state']['гипотермия']['is_true'] = True
-
-        else:
-            check_status('гипотермия', user_id)
-
     else:
-        users[user_id]['state']['гипотермия']['streak'] = 2
+        users[user_id]['state']['в норме']['is_true'] = False
+        users[user_id]['state']['гипотермия']['is_true'] = True
+        users[user_id]['state']['гипотермия']['streak'] = 1
 
-        check_status('гипотермия', user_id)
     user_save(users)
+
 
 def check_status(state, user_id):
     users = user_load()
@@ -106,17 +122,5 @@ def check_status(state, user_id):
     if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
         users[user_id]['state']['в норме']['is_true'] = True
     else:
-        try:
-            users[user_id]['state']['в норме']['is_true'] = True
-        except KeyError:
-            pass
-    user_save(users)
-
-
-def check_stt(user_id, hrs, mins):
-    users = user_load()
-
-    users[user_id]['stt']['стамина'] -= (3 * hrs)
-    users[user_id]['stt']['стамина'] -= (1 * mins)
-
+        users[user_id]['state']['в норме']['is_true'] = True
     user_save(users)

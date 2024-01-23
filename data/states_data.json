@@ -15,7 +15,7 @@
     "effect_2": "истощение"},
 
   "истощение": {
-    "max_state_streak": 2,
+    "max_state_streak": 1,
     "effect_1": "мертв",
     "effect_2": "в норме"},
 

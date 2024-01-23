@@ -59,25 +59,36 @@ def states_load():
 
 
 class LocationsClass:
-    def __init__(self, name: str = 'undefined', ways: list = None, time_to_move: list = None, description: str = None, loc_temp: float = None, loot: list = None):
+    def __init__(self, name: str = 'undefined', ways: list = None, time_to_move: list = None, description: str = None, loc_temp: float = None, ):
         self.name = name
         self.ways = ways
         self.time_to_move = time_to_move
         self.description = description
         self.loc_temp = loc_temp
-        self.loot = loot
 
-    def loot_generation(self):
-        k = random.randrange(0, len(items_list) - 1)
-        names = random.choices(items_list, k=k)
-        for name in names:
-            self.loot.append(name)
 
+
+wood = LocationsClass('лес', ["темный лес", "магазин", "конец города"],
+                      [5, 0], "Лес. Здесь довольно холодно", -5.2)
+beginning = LocationsClass('дом', ['здания'], [1, 30],
+                           'Ваша квартира. Из полезного осталось лишь немного еды', -4.3)
+buildings = LocationsClass('здания', ['дом', 'дорога'], [1, 0]
+                           , 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6)
+road = LocationsClass('дорога', ['здания', 'деревня'], [7, 0],
+                      'Одна из немногих дорог из города, путь кажется вам знакомым. Деревня? Идти придется долго, да и холодно здесь', -8.1)
+village = LocationsClass('деревня', ['дорога'], [7, 0],
+                         'Маленькая деревушка. Когда-то вы здесь жили', -3.2)
+shop = LocationsClass('торговый центр', ['здания'], [2, 45],
+                      'Ранее одно из самых популярных мест в городе. Сейчас здесь мало что осталось', -5.2)
 
 def class_to_dict(self):
     return self.__dict__
 
 
+def get_name(body_part):
+    for item in items_2:
+        if item.name.endswith(' нет') and item.body_part == body_part:
+            return item
 
 
 class ItemsClass:
@@ -106,54 +117,84 @@ class ClothesClass(ItemsClass):
     def use(self, user_id):
         users = user_load()
         users[user_id]['inv'].remove(self.name)
-        users[user_id]['equipment'][self.body_part].append(self.name)
+        users[user_id]['equipment'][self.body_part] = self.name
         if users[user_id]['equipment'][self.body_part][0].endswith('нет'):
             users[user_id]['equipment'][self.body_part].remove(users[user_id]['equipment'][self.body_part][0])
         user_save(users)
         return True
 
 
-class FoodClass(ItemsClass):
-    def __init__(self, name, weight, durability, food_koef):
-        super().__init__(name, weight, durability)
-        self.food_koef = food_koef
-
-    def use(self, user_id):
-        users = user_load()
-
-
-naked_head = ClothesClass('шапки нет', 0, 0, 0.8, 'head')
-naked_body = ClothesClass('курток нет', 0, 0, 0.8,  'body')
-naked_legs = ClothesClass('штанов нет', 0, 0, 0.8,  'legs')
-naked_feet = ClothesClass('ботинок нет', 0, 0, 0.8,  'feet')
+naked_head = ClothesClass('шапки нет', 0, 0, 0.5, 'head')
+naked_body = ClothesClass('курток нет', 0, 0, 0.5,  'body')
+naked_legs = ClothesClass('штанов нет', 0, 0, 0.5,  'legs')
+naked_feet = ClothesClass('ботинок нет', 0, 0, 0.5,  'feet')
 
 cap = ClothesClass('шапка', 0.4, 80, 1.0, 'head')
 coat = ClothesClass('куртка', 3.0, 100, 1.3, 'body')
 jeans = ClothesClass('джинсы', 1.5, 70, 1.2, 'legs')
-underpants = ClothesClass('трусы', 0.2, 150, 0.9, 'legs')
 drawers = ClothesClass('подштанники', 1.2, 100, 1.3, 'legs')
 socks = ClothesClass('носки', 0.1, 50, 0.9, 'feet')
 bots = ClothesClass('ботинки', 1.1, 50, 1.2, 'feet')
 
-items_list = [cap.name, coat.name, jeans.name, underpants.name, underpants.name, drawers.name, socks.name, bots.name]
+
+class FoodClass(ItemsClass):
+    def __init__(self, name, weight, food_koef, drink_koef):
+        super().__init__(name, weight)
+        self.food_koef = food_koef
+        self.drink_koef = drink_koef
+
+    def use(self, user_id):
+        users = user_load()
+        if users[user_id]['stt']['сытость'] < 100:
+            users[user_id]['stt']['сытость'] += self.food_koef
+            users[user_id]['stt']['жажда'] += self.drink_koef
+            if self.name == 'суп из опилок':
+                users[user_id]['temp']['self_temp'] += 0.4
+            return True
+        else:
+            return False
 
 
-wood = LocationsClass('лес', ["темный лес", "магазин", "конец города"], [5, 0], "Лес. Здесь довольно холодно", -5.2, [])
-darker_wood = LocationsClass('темный лес', ["лес", "черный лес"], [10, 0], "Темный лес. Здесь даже холоднее", -10.7, [])
-darkest_wood = LocationsClass('черный лес', ["темный лес", "конец"], [5, 0], "Черный лес. Дальше носа не видно, пора разворачиваться ", -15.9, [])
-beginning = LocationsClass('дом', ['руины', 'здания', 'девятый район'], [0, 30], 'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, ['шапка', 'джинсы', 'трусы', 'ботинки'])
-buildings = LocationsClass('здания', ['дом', 'руины', 'девятый район', 'дорога'], [1, 0], 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6, [])
-road = LocationsClass('дорога', ['здания', '*табличку занесло снегом*'], [7, 0], 'Одна из немногих дорог из города, путь кажется вам знакомым. Деревня? Идти придется долго, да и холодно здесь', -8.1, [])
-village = LocationsClass('деревня', ['дорога'], [7, 0], 'Маленькая деревушка. Когда-то вы здесь жили', -3.2, [])
+soup = FoodClass('суп из опилок', 0.5, 20, 5)
+steak = FoodClass('стейк', 0.7, 40, -5)
+canned_beans = FoodClass('консервированные бобы', 1.0, 15, 15)
+bread = FoodClass('хлеб', 0.4, 20, -2)
+pasta = FoodClass('макароны', 0.6, 24, 3)
 
 
-buildings.loot_generation()
-village.loot_generation()
+class DrinksClass(ItemsClass):
+    def __init__(self, name, weight, drink_koef):
+        super().__init__(name, weight)
+        self.drink_koef = drink_koef
 
-items_2 = {naked_head, naked_body, naked_legs, naked_legs, naked_feet, cap,
-             coat, jeans, underpants, underpants, drawers, socks,  bots}
+    def use(self, user_id):
+        users = user_load()
+        if users[user_id]['stt']['жажда'] < 100:
+            users[user_id]['stt']['жажда'] += self.drink_koef
+            if self.name == 'энергетик':
+                users[user_id]['stt']['стамина'] += 10
+            return True
+        else:
+            return False
 
-locations_list = [wood, darker_wood, darkest_wood, beginning, buildings, road, village]
+
+energetic = DrinksClass('энергетик', 2, 40)
+water_small = DrinksClass('вода (0.5л)', 1, 15)
+water_medium = DrinksClass('вода (1л)', 2, 30)
+water_big = DrinksClass('вода (5л)', 6, 80)
+cola = DrinksClass('кола', 1, 35)
+
+items_2 = {naked_head, naked_body, naked_legs, naked_legs, naked_feet, cap, coat, jeans, drawers, socks, bots,
+           soup, steak, canned_beans, bread, pasta,
+           energetic, water_small, water_medium, water_big, cola}
+
+
+items_list = [cap.name, coat.name, jeans.name, drawers.name, socks.name, bots.name,
+              soup.name, steak.name, canned_beans.name, bread.name, pasta.name,
+              energetic.name, water_small.name, water_medium.name, water_big.name, cola.name]
+
+
+locations_list = [wood, beginning, buildings, road, village, shop]
 for loc in locations_list:
     locations = locations_load()
     locations[loc.name] = loc
@@ -164,6 +205,12 @@ for item in items_2:
     items['clothes'][item.name] = item
     items_save(items)
 
-for item in items_2:
-    if item.name == 'шапка':
-        pass
+
+def loot_generation(user_id):
+    users = user_load()
+    for loc in users[user_id]['loot']:
+        k = random.randrange(0, len(items_list) - 1)
+        names = random.choices(items_list, k=k)
+        for name in names:
+            users[user_id]['loot'][loc] += names
+    user_save(users)

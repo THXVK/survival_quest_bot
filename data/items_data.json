@@ -4,7 +4,7 @@
       "name": "ботинок нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.8,
+      "item_temp_koef": 0.5,
       "body_part": "feet"
     },
     "подштанники": {
@@ -32,14 +32,14 @@
       "name": "шапки нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.8,
+      "item_temp_koef": 0.5,
       "body_part": "head"
     },
     "курток нет": {
       "name": "курток нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.8,
+      "item_temp_koef": 0.5,
       "body_part": "body"
     },
     "куртка": {
@@ -53,7 +53,7 @@
       "name": "штанов нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.8,
+      "item_temp_koef": 0.5,
       "body_part": "legs"
     },
     "джинсы": {
@@ -76,6 +76,71 @@
       "durability": 150,
       "item_temp_koef": 0.9,
       "body_part": "legs"
+    },
+    "суп из опилок": {
+      "name": "суп из опилок",
+      "weight": 0.5,
+      "durability": 1,
+      "food_koef": 20,
+      "drink_koef": 5
+    },
+    "стейк": {
+      "name": "стейк",
+      "weight": 0.7,
+      "durability": 1,
+      "food_koef": 40,
+      "drink_koef": -5
+    },
+    "консервированные бобы": {
+      "name": "консервированные бобы",
+      "weight": 1.0,
+      "durability": 1,
+      "food_koef": 15,
+      "drink_koef": 15
+    },
+    "хлеб": {
+      "name": "хлеб",
+      "weight": 0.4,
+      "durability": 1,
+      "food_koef": 20,
+      "drink_koef": -2
+    },
+    "макароны": {
+      "name": "макароны",
+      "weight": 0.6,
+      "durability": 1,
+      "food_koef": 24,
+      "drink_koef": 3
+    },
+    "энергетик": {
+      "name": "энергетик",
+      "weight": 2,
+      "durability": 1,
+      "drink_koef": 40
+    },
+    "вода (0.5л)": {
+      "name": "вода (0.5л)",
+      "weight": 1,
+      "durability": 1,
+      "drink_koef": 15
+    },
+    "вода (1л)": {
+      "name": "вода (1л)",
+      "weight": 2,
+      "durability": 1,
+      "drink_koef": 30
+    },
+    "вода (5л)": {
+      "name": "вода (5л)",
+      "weight": 6,
+      "durability": 1,
+      "drink_koef": 80
+    },
+    "кола": {
+      "name": "кола",
+      "weight": 1,
+      "durability": 1,
+      "drink_koef": 35
     }
   }
 }
