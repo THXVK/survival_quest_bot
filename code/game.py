@@ -20,7 +20,11 @@ def up_time(user_id: str, time_to: list):
     users[user_id]['stt']["жажда"]['num'] -= (0.5 * time_to[1])
 
     for stt in users[user_id]['stt']:
+        if users[user_id]['stt'][stt]['num'] < 0:
+            users[user_id]['stt'][stt]['num'] = 0
+
         param = users[user_id]['stt'][stt]['num']
+
         if param > 25:
             state_1 = users[user_id]['stt'][stt]['rel_states']
 
@@ -52,9 +56,23 @@ def up_time(user_id: str, time_to: list):
     if hrs_num >= 24:
         hrs_num -= 24
         days_num += 1
+        states = states_load()
         for state in users[user_id]['state']:
             if users[user_id]['state'][state]['is_true']:
                 users[user_id]['state'][state]['streak'] += 1
+
+                if users[user_id]['state'][state]['streak'] >= states[state]['max_state_streak']:
+                    users[user_id]['status'] = states[state]['effect_1']
+                    new_state = states[state]['effect_2']
+                    users[user_id]['state'][new_state]['is_true'] = True
+                    users[user_id]['state'][state]['is_true'] = False
+                else:
+                    users[user_id]['state'][state]['streak'] += 1
+
+        if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
+            users[user_id]['state']['в норме']['is_true'] = True
+        else:
+            users[user_id]['state']['в норме']['is_true'] = False
 
     users[user_id]['time']['mins'] = mins_num
     users[user_id]['time']['hrs'] = hrs_num
@@ -101,26 +119,25 @@ def new_temperature(user_id):
     if total_temp > 5:
         pass
     else:
+        states = states_load()
         users[user_id]['state']['в норме']['is_true'] = False
         users[user_id]['state']['гипотермия']['is_true'] = True
         users[user_id]['state']['гипотермия']['streak'] = 1
 
+        if users[user_id]['state']['гипотермия']['streak'] >= states['гипотермия']['max_state_streak']:
+            users[user_id]['status'] = states['гипотермия']['effect_1']
+            new_state = states['гипотермия']['effect_2']
+            users[user_id]['state'][new_state]['is_true'] = True
+            users[user_id]['state']['гипотермия']['is_true'] = False
+        else:
+            users[user_id]['state']['гипотермия']['streak'] += 1
+
+        if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
+            users[user_id]['state']['в норме']['is_true'] = True
+        else:
+            users[user_id]['state']['в норме']['is_true'] = False
+
     user_save(users)
 
 
-def check_status(state, user_id):
-    users = user_load()
-    states = states_load()
 
-    if users[user_id]['state'][state]['streak'] == states[state]['max_state_streak']:
-        users[user_id]['status'] = states[state]['effect_1']
-        users[user_id]['state'][states[state]['effect_2']]['is_true'] = True
-        users[user_id]['state'][state]['is_true'] = False
-    else:
-        users[user_id]['state'][state]['streak'] += 1
-
-    if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
-        users[user_id]['state']['в норме']['is_true'] = True
-    else:
-        users[user_id]['state']['в норме']['is_true'] = True
-    user_save(users)

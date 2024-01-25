@@ -4,7 +4,7 @@
       "name": "ботинок нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.5,
+      "item_temp_koef": 0.6,
       "body_part": "feet"
     },
     "подштанники": {
@@ -32,14 +32,14 @@
       "name": "шапки нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.5,
+      "item_temp_koef": 0.6,
       "body_part": "head"
     },
     "курток нет": {
       "name": "курток нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.5,
+      "item_temp_koef": 0.6,
       "body_part": "body"
     },
     "куртка": {
@@ -53,7 +53,7 @@
       "name": "штанов нет",
       "weight": 0,
       "durability": 0,
-      "item_temp_koef": 0.5,
+      "item_temp_koef": 0.6,
       "body_part": "legs"
     },
     "джинсы": {

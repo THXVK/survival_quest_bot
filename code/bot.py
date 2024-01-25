@@ -76,17 +76,18 @@ def start(message: Message) -> None:
                     },
             'status': 'жив',
             'temperature': -20.0,
-            'loot': {'торговый центр': [],
-                     'деревня': [],
+            'loot': {'торговый центр': ['куртка'],
+                     'деревня': ['суп из опилок'],
                      'дорога': [],
                      'здания': [],
-                     'дом': [],
+                     'дом': ['хлеб', 'вода (0.5л)'],
                      'лес': []
                       }
         }
         user_save(users)
         loot_generation(user_id)
-        txt = ('Ваша цель - протянуть 30 дней. Внимательно cледите за вашим состоянием и помните,'
+        txt = ('это альфа версия бота,так что если вам попадется ошибка, прошу, дайте фидбек '
+               'Ваша цель - протянуть 30 дней. Внимательно cледите за вашим состоянием и помните,'
                ' что с каждым днем будет становиться только холоднее! Итак, игра начинается!')
 
         bot.send_message(chat_id=message.chat.id,
@@ -101,6 +102,13 @@ def game_actions(m_id) -> None:
     users = user_load()
     user_id = str(m_id)
 
+    equp_txt = f"""На вас надето:
+голова - {', '.join((list(users[user_id]["equipment"]["head"])))}
+тело - {', '.join(list(users[user_id]["equipment"]["body"]))} 
+ноги - {', '.join(list(users[user_id]["equipment"]["legs"]))}
+ступни - {', '.join(list(users[user_id]["equipment"]["feet"]))}
+        """
+    bot.send_message(m_id, text=equp_txt)
     state_list_1 = []
     for state in users[user_id]['state']:
         if users[user_id]['state'][state]['is_true']:
@@ -109,6 +117,7 @@ def game_actions(m_id) -> None:
 
     stt_txt = ''
     for stat in users[user_id]['stt']:
+
         if users[user_id]['stt'][stat]['num'] >= 75:
             stt_txt += f'{stat}: в норме\n'
         elif 25 < users[user_id]['stt'][stat]['num'] < 75:
@@ -121,7 +130,7 @@ def game_actions(m_id) -> None:
     
 состояние: {state_list_2[:]}
 статус: {users[user_id]['status']}
-температура: {users[user_id]['temperature']}
+температура: {round(users[user_id]['temperature'], 1)}
 {stt_txt}
 """
 
@@ -170,14 +179,13 @@ def restart(message: Message) -> None:
                     },
             'status': 'жив',
             'temperature': -20.0,
-            'loot': {'торговый центр': [],
-                     'деревня': [],
+            'loot': {'торговый центр': ['куртка'],
+                     'деревня': ['суп из опилок'],
                      'дорога': [],
                      'здания': [],
-                     'дом': [],
+                     'дом': ['хлеб', 'вода (0.5л)'],
                      'лес': []
-
-            }
+                      }
         }
         user_save(users)
         loot_generation(user_id)
@@ -227,8 +235,8 @@ def inv_navigation(call) -> None:
     users = user_load()
     pages_list = users[user_id]['inv']
     page = int(req[1])
-
     pages_num = len(users[user_id]['inv'])
+
     if req[0] == 'unseen':
         try:
             bot.delete_message(m_id, call.message.message_id)
@@ -240,37 +248,84 @@ def inv_navigation(call) -> None:
         page += 1
         if page == pages_num:
             page = 0
+        try:
+            cur_page = page + 1
+            inv_markup = InlineKeyboardMarkup()
+            button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
+            button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+            button_1_3 = InlineKeyboardButton('->', callback_data=f'forward_{page}_{pages_num}_nav')
+            button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
+            button_1_5 = InlineKeyboardButton(f'использовать', callback_data=f'use_{page}_{pages_num}_nav')
+            inv_markup.add(button_1_5)
+            inv_markup.add(button_1_2, button_1_4, button_1_3)
+            inv_markup.add(button_1_1)
+
+            bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
+                                  text=pages_list[page], reply_markup=inv_markup)
+        except Exception:
+            pass
 
     elif req[0] == 'back':
         page -= 1
         if page < 0:
             page = pages_num - 1
+        try:
+            cur_page = page + 1
+            inv_markup = InlineKeyboardMarkup()
+            button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
+            button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+            button_1_3 = InlineKeyboardButton('->', callback_data=f'forward_{page}_{pages_num}_nav')
+            button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
+            button_1_5 = InlineKeyboardButton(f'использовать', callback_data=f'use_{page}_{pages_num}_nav')
+            inv_markup.add(button_1_5)
+            inv_markup.add(button_1_2, button_1_4, button_1_3)
+            inv_markup.add(button_1_1)
+
+            bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
+                                  text=pages_list[page], reply_markup=inv_markup)
+        except Exception:
+            pass
 
     elif req[0] == 'use':
         for item in items_2:
             try:
                 if pages_list[page] == item.name:
                     if item.use(user_id):
+                        users = user_load()
                         page = 0
+                        user_save(users)
                         bot.send_message(m_id, text='вы использовали предмет')
                     else:
                         bot.send_message(m_id, text='вы не можете использовать этот предмет')
 
-                    cur_page = page + 1
-                    inv_markup = InlineKeyboardMarkup()
-                    button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
-                    button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
-                    button_1_3 = InlineKeyboardButton('->', callback_data=f'forward_{page}_{pages_num}_nav')
-                    button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
-                    button_1_5 = InlineKeyboardButton(f'использовать', callback_data=f'use_{page}_{pages_num}_nav')
-                    inv_markup.add(button_1_5)
-                    inv_markup.add(button_1_2, button_1_4, button_1_3)
-                    inv_markup.add(button_1_1)
-                    try:
-                        bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
-                                              text=pages_list[page], reply_markup=inv_markup)
-                    except Exception:
-                        pass
+                    if pages_num >= 0:
+                        cur_page = page + 1
+                        pages_num = len(users[user_id]['inv'])
+                        inv_markup = InlineKeyboardMarkup()
+                        button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
+                        button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+                        button_1_3 = InlineKeyboardButton('->', callback_data=f'forward_{page}_{pages_num}_nav')
+                        button_1_4 = InlineKeyboardButton(f'{cur_page}/{pages_num}', callback_data=f'  ')
+                        button_1_5 = InlineKeyboardButton(f'использовать', callback_data=f'use_{page}_{pages_num}_nav')
+                        inv_markup.add(button_1_5)
+                        inv_markup.add(button_1_2, button_1_4, button_1_3)
+                        inv_markup.add(button_1_1)
+                        try:
+                            bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
+                                                  text=pages_list[page], reply_markup=inv_markup)
+                        except Exception:
+                            pass
+                    else:
+
+                        inv_markup = InlineKeyboardMarkup()
+                        button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
+                        inv_markup.add(button_1_1)
+                        try:
+                            bot.edit_message_text(chat_id=m_id, message_id=call.message.message_id,
+                                                  text='инвентарь пуст', reply_markup=inv_markup)
+                        except Exception:
+                            pass
+
             except IndexError:
                 inv_markup = InlineKeyboardMarkup()
                 button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
@@ -281,16 +336,18 @@ def inv_navigation(call) -> None:
                 except Exception:
                     pass
 
+
 @bot.callback_query_handler(func=lambda call: call.data == 'sleep')
 def sleep(call) -> None:
     m_id = call.message.chat.id
-    msg = bot.send_message(m_id, text='введите время сна  формате "9:00" (максимум - 10 часов)')
+    msg = bot.send_message(m_id, text='введите время сна  формате "9:56" (максимум - 10 часов)')
     bot.register_next_step_handler(msg, sleep_answer)
 
 
 def sleep_answer(message):
     users = user_load()
     user_id = str(message.chat.id)
+
     try:
         time = message.text.split(':')
         if len(time) <= 1:
@@ -302,8 +359,12 @@ def sleep_answer(message):
         mins = int(time[1])
 
         if (hrs == 10 and mins == 0) or (0 <= hrs < 10 and 0 <= mins < 60):
+            user_stamina = users[user_id]['stt']['стамина']['num']
+
             up_time(user_id, [hrs, mins])
-            users[user_id]['stt']['стамина']['num'] += 10 * hrs + 0.5 * mins
+            users = user_load()
+            users[user_id]['stt']['стамина']['num'] += (user_stamina + 10 * hrs + 0.5 * mins)
+            user_save(users)
             if hrs >= 7 and mins >= 30:
                 if users[user_id]['state']['усталость']['is_true']:
                     users[user_id]['state']['усталость']['is_true'] = False
@@ -314,22 +375,26 @@ def sleep_answer(message):
                     users[user_id]['state']['усталость']['is_true'] = True
                     users[user_id]['state']['усталость']['streak'] = 0
 
-                if users[user_id]['stt']['стамина']['num'] > 100:
-                    users[user_id]['stt']['стамина']['num'] = 100
+            if users[user_id]['stt']['стамина']['num'] > 100:
+                users[user_id]['stt']['стамина']['num'] = 100
+
+            elif users[user_id]['stt']['стамина']['num'] < 0:
+                users[user_id]['stt']['стамина']['num'] = 100
 
             game_actions(message.chat.id)
+
         elif 0 > mins >= 60:
             msg = bot.send_message(message.chat.id, text='сколько в часе минут? подсказка: 1 - 59')
             bot.register_next_step_handler(msg, sleep_answer)
+
         else:
             msg = bot.send_message(message.chat.id, text='вы можете ввести часы только в диапазоне от 0 до 10')
             bot.register_next_step_handler(msg, sleep_answer)
-    except ValueError as err:
-        print(err)
+
+    except ValueError:
         user_save(users)
         msg = bot.send_message(message.chat.id, text='введите время цифрами в указанном формате')
         bot.register_next_step_handler(msg, sleep_answer)
-        user_save(users)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'change_location')
@@ -378,9 +443,11 @@ def change_location(call) -> None:
     txt = 'подождите' + '.' * i
     bot.edit_message_text(chat_id=loading_message.chat.id, message_id=loading_message.id, text=txt)
     bot.delete_message(m_id, loading_message.id)
-    with open("""images\img.png""", 'rb') as photo:
-        bot.send_photo(m_id, photo, caption=f'сейчас вы находитесь в локации "{users[user_id]["location"]}"')
 
+    path = locations[new_loc]['path']
+    with open(path, 'rb') as photo:
+        bot.send_photo(m_id, photo, caption=f'сейчас вы находитесь в локации "{users[user_id]["location"]}"')
+    user_save(users)
     game_actions(m_id)
 
 
@@ -410,12 +477,12 @@ def scouting(call) -> None:
 
     found_items_list = users[user_id]['loot'][location]
 
-    if len(locations[location]['loot']) == 1:
+    if len(found_items_list) == 1:
         txt_2 = f'вы что-то нашли: {", ".join(found_items_list)}'
         bot.send_message(chat_id=m_id, text=txt_2)
         scouting_2(call, 0)
 
-    elif len(locations[location]['loot']) > 1:
+    elif len(found_items_list) > 1:
         txt_2 = f'вы нашли несколько предметов: {", ".join(found_items_list)}'
         bot.send_message(chat_id=m_id, text=txt_2)
         scouting_2(call, 0)
@@ -465,12 +532,12 @@ def pick_or_drop(call):
     if choice == 'pick-up':
         for item in items_2:
             if item.name == item_name:
-                if item.pick_up(user_id):
-                    item.pick_up(user_id)
+                if (users[user_id]['weight'] + item.weight) <= users[user_id]['max_weight']:
+                    users[user_id]['inv'].append(item.name)
+                    users[user_id]['weight'] += item.weight
                     bot.send_message(m_id, text='вы подобрали предмет')
-                    loot.pop(x)
+                    users[user_id]['loot'][location].pop(x)
                     user_save(users)
-
                     scouting_2(call, x)
                 else:
                     loot_markup = InlineKeyboardMarkup()
@@ -482,6 +549,7 @@ def pick_or_drop(call):
         x += 1
         bot.send_message(m_id, text='вы оставили предмет')
         scouting_2(call, x)
+    user_save(users)
 
 
 @bot.message_handler(content_types=['text'])

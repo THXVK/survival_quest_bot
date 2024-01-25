@@ -5,7 +5,7 @@
     "effect_2": "в норме"
   },
   "в норме": {
-    "max_state_streak": null,
+    "max_state_streak": 0,
     "effect_1": "жив",
     "effect_2": "в норме"
   },

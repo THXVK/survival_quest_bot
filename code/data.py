@@ -59,27 +59,27 @@ def states_load():
 
 
 class LocationsClass:
-    def __init__(self, name: str = 'undefined', ways: list = None, time_to_move: list = None, description: str = None, loc_temp: float = None, ):
+    def __init__(self, name: str = 'undefined', ways: list = None, time_to_move: list = None, description: str = None, loc_temp: float = None, path: str = None):
         self.name = name
         self.ways = ways
         self.time_to_move = time_to_move
         self.description = description
         self.loc_temp = loc_temp
+        self.path = path
 
-
-
-wood = LocationsClass('лес', ["темный лес", "магазин", "конец города"],
-                      [5, 0], "Лес. Здесь довольно холодно", -5.2)
+wood = LocationsClass('лес', ['дорога'],
+                      [5, 0], "Лес. Здесь довольно холодно", -5.2, '../pictures/img_1.png')
 beginning = LocationsClass('дом', ['здания'], [1, 30],
-                           'Ваша квартира. Из полезного осталось лишь немного еды', -4.3)
-buildings = LocationsClass('здания', ['дом', 'дорога'], [1, 0]
-                           , 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6)
-road = LocationsClass('дорога', ['здания', 'деревня'], [7, 0],
-                      'Одна из немногих дорог из города, путь кажется вам знакомым. Деревня? Идти придется долго, да и холодно здесь', -8.1)
+                           'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, '\../pictures/img_2.png')
+buildings = LocationsClass('здания', ['торговый центр', 'дом', 'дорога'], [1, 0]
+                           , 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6, '../pictures/img.png')
+road = LocationsClass('дорога', ['здания', 'деревня', 'лес'], [7, 0],
+                      'Одна из немногих дорог из города, путь кажется вам знакомым. Деревня? Идти придется долго, да и холодно здесь', -8.1, '../pictures/img_4.png')
 village = LocationsClass('деревня', ['дорога'], [7, 0],
-                         'Маленькая деревушка. Когда-то вы здесь жили', -3.2)
+                         'Маленькая деревушка. Когда-то вы здесь жили', -3.2, '../pictures/img_3.png')
 shop = LocationsClass('торговый центр', ['здания'], [2, 45],
-                      'Ранее одно из самых популярных мест в городе. Сейчас здесь мало что осталось', -5.2)
+                      'Ранее одно из самых популярных мест в городе. Сейчас здесь мало что осталось', -5.2, '../pictures/img_5.png')
+
 
 def class_to_dict(self):
     return self.__dict__
@@ -103,6 +103,7 @@ class ItemsClass:
             users[user_id]['inv'].append(self.name)
             users[user_id]['weight'] += self.weight
             user_save(users)
+
             return True
         else:
             return False
@@ -117,17 +118,18 @@ class ClothesClass(ItemsClass):
     def use(self, user_id):
         users = user_load()
         users[user_id]['inv'].remove(self.name)
-        users[user_id]['equipment'][self.body_part] = self.name
-        if users[user_id]['equipment'][self.body_part][0].endswith('нет'):
-            users[user_id]['equipment'][self.body_part].remove(users[user_id]['equipment'][self.body_part][0])
+        users[user_id]['equipment'][self.body_part][self.name] = self.durability
+        for elem in list(users[user_id]['equipment'][self.body_part]):
+            if elem.endswith('нет'):
+                users[user_id]['equipment'][self.body_part].pop(elem)
         user_save(users)
         return True
 
 
-naked_head = ClothesClass('шапки нет', 0, 0, 0.5, 'head')
-naked_body = ClothesClass('курток нет', 0, 0, 0.5,  'body')
-naked_legs = ClothesClass('штанов нет', 0, 0, 0.5,  'legs')
-naked_feet = ClothesClass('ботинок нет', 0, 0, 0.5,  'feet')
+naked_head = ClothesClass('шапки нет', 0, 0, 0.6, 'head')
+naked_body = ClothesClass('курток нет', 0, 0, 0.6,  'body')
+naked_legs = ClothesClass('штанов нет', 0, 0, 0.6,  'legs')
+naked_feet = ClothesClass('ботинок нет', 0, 0, 0.6,  'feet')
 
 cap = ClothesClass('шапка', 0.4, 80, 1.0, 'head')
 coat = ClothesClass('куртка', 3.0, 100, 1.3, 'body')
@@ -145,11 +147,13 @@ class FoodClass(ItemsClass):
 
     def use(self, user_id):
         users = user_load()
-        if users[user_id]['stt']['сытость'] < 100:
-            users[user_id]['stt']['сытость'] += self.food_koef
-            users[user_id]['stt']['жажда'] += self.drink_koef
+        if users[user_id]['stt']['сытость']['num'] < 100:
+            users[user_id]['stt']['сытость']['num'] += self.food_koef
+            users[user_id]['stt']['жажда']['num'] += self.drink_koef
             if self.name == 'суп из опилок':
                 users[user_id]['temp']['self_temp'] += 0.4
+            users[user_id]['inv'].remove(self.name)
+
             return True
         else:
             return False
@@ -169,10 +173,13 @@ class DrinksClass(ItemsClass):
 
     def use(self, user_id):
         users = user_load()
-        if users[user_id]['stt']['жажда'] < 100:
-            users[user_id]['stt']['жажда'] += self.drink_koef
+        if users[user_id]['stt']['жажда']['num'] < 100:
+            users[user_id]['stt']['жажда']['num'] += self.drink_koef
             if self.name == 'энергетик':
-                users[user_id]['stt']['стамина'] += 10
+                users[user_id]['stt']['стамина']['num'] += 10
+            users[user_id]['inv'].remove(self.name)
+            user_save(users)
+
             return True
         else:
             return False
@@ -195,6 +202,7 @@ items_list = [cap.name, coat.name, jeans.name, drawers.name, socks.name, bots.na
 
 
 locations_list = [wood, beginning, buildings, road, village, shop]
+
 for loc in locations_list:
     locations = locations_load()
     locations[loc.name] = loc
@@ -211,6 +219,5 @@ def loot_generation(user_id):
     for loc in users[user_id]['loot']:
         k = random.randrange(0, len(items_list) - 1)
         names = random.choices(items_list, k=k)
-        for name in names:
-            users[user_id]['loot'][loc] += names
+        users[user_id]['loot'][loc] += names
     user_save(users)
