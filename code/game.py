@@ -117,7 +117,7 @@ def new_temperature(user_id):
     users[user_id]['temperature'] = total_world_temp
 
     if total_temp > 5:
-        pass
+        users[user_id]['state']['гипотермия']['is_true'] = False
     else:
         states = states_load()
         users[user_id]['state']['в норме']['is_true'] = False
