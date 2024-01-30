@@ -126,10 +126,10 @@ class ClothesClass(ItemsClass):
         return True
 
 
-naked_head = ClothesClass('шапки нет', 0, 0, 0.6, 'head')
-naked_body = ClothesClass('курток нет', 0, 0, 0.6,  'body')
-naked_legs = ClothesClass('штанов нет', 0, 0, 0.6,  'legs')
-naked_feet = ClothesClass('ботинок нет', 0, 0, 0.6,  'feet')
+naked_head = ClothesClass('шапки нет', 0, 0, 0.8, 'head')
+naked_body = ClothesClass('курток нет', 0, 0, 0.8,  'body')
+naked_legs = ClothesClass('штанов нет', 0, 0, 0.8,  'legs')
+naked_feet = ClothesClass('ботинок нет', 0, 0, 0.8,  'feet')
 
 cap = ClothesClass('шапка', 0.4, 80, 1.0, 'head')
 coat = ClothesClass('куртка', 3.0, 100, 1.3, 'body')
