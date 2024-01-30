@@ -562,4 +562,4 @@ def echo(message: Message) -> None:
     bot.send_message(chat_id=message.chat.id, text=f'Вы напечатали: {message.text}. Что?')
 
 
-bot.polling()
+bot.infinity_polling()
