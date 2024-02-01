@@ -123,7 +123,7 @@ class ClothesClass(ItemsClass):
             if elem.endswith('нет'):
                 users[user_id]['equipment'][self.body_part].pop(elem)
         user_save(users)
-        return True
+        return f'вы надели предмет: {self.name}'
 
 
 naked_head = ClothesClass('шапки нет', 0, 0, 0.8, 'head')
@@ -154,9 +154,16 @@ class FoodClass(ItemsClass):
                 users[user_id]['temp']['self_temp'] += 0.4
             users[user_id]['inv'].remove(self.name)
 
-            return True
-        else:
-            return False
+            txt = f'вы использовали предмет: {self.name}'
+            for stat in users[user_id]['stt']:
+                if users[user_id]['stt'][stat]['num'] >= 75:
+                    txt += f'{stat}: в норме\n'
+                elif 25 < users[user_id]['stt'][stat]['num'] < 75:
+                    txt += f'{stat}: средне\n'
+                else:
+                    txt += f'{stat}: мало\n'
+
+            return txt
 
 
 soup = FoodClass('суп из опилок', 0.5, 20, 5)

@@ -291,10 +291,11 @@ def inv_navigation(call) -> None:
             try:
                 if pages_list[page] == item.name:
                     if item.use(user_id):
+                        txt = item.use(user_id)
                         users = user_load()
                         page = 0
                         user_save(users)
-                        bot.send_message(m_id, text='вы использовали предмет')
+                        bot.send_message(m_id, text=txt)
                     else:
                         bot.send_message(m_id, text='вы не можете использовать этот предмет')
 
