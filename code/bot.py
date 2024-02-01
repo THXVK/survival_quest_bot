@@ -59,7 +59,7 @@ def start(message: Message) -> None:
                           'feet': {'носки': items['clothes']['носки']['durability']}
                           },
             'inv': [],
-            'max_weight': 50,
+            'max_weight': 30,
             'weight': 0,
             'state': {'в норме': {'streak': 1, 'is_true': True},
                       'усталость': {'streak': 0, 'is_true': False},
@@ -162,7 +162,7 @@ def restart(message: Message) -> None:
                           'feet': {'носки': items['clothes']['носки']['durability']}
                           },
             'inv': [],
-            'max_weight': 50,
+            'max_weight': 30,
             'weight': 0,
             'state': {'в норме': {'streak': 1, 'is_true': True},
                       'усталость': {'streak': 0, 'is_true': False},
@@ -204,6 +204,11 @@ def inv(call) -> None:
     user_id = str(m_id)
     users = user_load()
 
+    try:
+        bot.delete_message(m_id, call.message.message_id)
+    except Exception:
+        pass
+
     pages_list = users[user_id]['inv']
     pages_num = len(users[user_id]['inv'])
     page = 0
@@ -240,9 +245,11 @@ def inv_navigation(call) -> None:
     if req[0] == 'unseen':
         try:
             bot.delete_message(m_id, call.message.message_id)
-            game_actions(m_id)
+
         except TimeoutError:
             pass
+        else:
+            game_actions(m_id)
 
     elif req[0] == 'forward':
         page += 1
@@ -290,9 +297,10 @@ def inv_navigation(call) -> None:
         for item in items_2:
             try:
                 if pages_list[page] == item.name:
-                    if item.use(user_id):
-                        txt = item.use(user_id)
+                    txt = item.use(user_id)
+                    if txt:
                         users = user_load()
+
                         page = 0
                         user_save(users)
                         bot.send_message(m_id, text=txt)
@@ -342,6 +350,10 @@ def inv_navigation(call) -> None:
 def sleep(call) -> None:
     m_id = call.message.chat.id
     msg = bot.send_message(m_id, text='введите время сна  формате "9:56" (максимум - 10 часов)')
+    try:
+        bot.delete_message(m_id, call.message.message_id)
+    except TimeoutError:
+        pass
     bot.register_next_step_handler(msg, sleep_answer)
 
 
@@ -415,6 +427,11 @@ def change_location(call) -> None:
     for button in buttons:
         ways_markup.add(button, row_width=list_len)
 
+    try:
+        bot.delete_message(m_id, call.message.message_id)
+    except Exception:
+        pass
+
     bot.send_message(chat_id=m_id, text='куда вы хотите пройти?', reply_markup=ways_markup)
 
 
@@ -433,10 +450,14 @@ def change_location(call) -> None:
     user_id = str(m_id)
     users = user_load()
     users[user_id]['location'] = new_loc
-
+    user_save(users)
     i = 2
     txt = 'подождите' + '.' * i
     bot.edit_message_text(chat_id=loading_message.chat.id, message_id=loading_message.id, text=txt)
+    try:
+        bot.delete_message(m_id, call.message.message_id)
+    except TimeoutError:
+        pass
 
     up_time(user_id, locations[new_loc]['time_to_move'])
 
@@ -448,7 +469,7 @@ def change_location(call) -> None:
     path = locations[new_loc]['path']
     with open(path, 'rb') as photo:
         bot.send_photo(m_id, photo, caption=f'сейчас вы находитесь в локации "{users[user_id]["location"]}"')
-    user_save(users)
+
     game_actions(m_id)
 
 
@@ -456,10 +477,14 @@ def change_location(call) -> None:
 def scouting(call) -> None:
     users = user_load()
     locations = locations_load()
-
     m_id = call.message.chat.id
     user_id = str(m_id)
     location = users[user_id]['location']
+
+    try:
+        bot.delete_message(m_id, call.message.message_id)
+    except TimeoutError:
+        pass
 
     up_time(user_id, [1, 0])
 
@@ -496,6 +521,12 @@ def scouting(call) -> None:
 
 def scouting_2(call, x):
     m_id = call.message.chat.id
+
+    try:
+
+        bot.edit_message_reply_markup(m_id, call.message.message_id, reply_markup=None)
+    except Exception:
+        pass
 
     user_id = str(m_id)
     users = user_load()

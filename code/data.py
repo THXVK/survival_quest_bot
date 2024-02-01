@@ -154,7 +154,7 @@ class FoodClass(ItemsClass):
                 users[user_id]['temp']['self_temp'] += 0.4
             users[user_id]['inv'].remove(self.name)
 
-            txt = f'вы использовали предмет: {self.name}'
+            txt = f'вы использовали предмет: {self.name}\n'
             for stat in users[user_id]['stt']:
                 if users[user_id]['stt'][stat]['num'] >= 75:
                     txt += f'{stat}: в норме\n'
@@ -162,8 +162,9 @@ class FoodClass(ItemsClass):
                     txt += f'{stat}: средне\n'
                 else:
                     txt += f'{stat}: мало\n'
-
+            user_save(users)
             return txt
+
 
 
 soup = FoodClass('суп из опилок', 0.5, 20, 5)
@@ -187,9 +188,17 @@ class DrinksClass(ItemsClass):
             users[user_id]['inv'].remove(self.name)
             user_save(users)
 
-            return True
-        else:
-            return False
+            txt = f'вы использовали предмет: {self.name}\n'
+            for stat in users[user_id]['stt']:
+                if users[user_id]['stt'][stat]['num'] >= 75:
+                    txt += f'{stat}: в норме\n'
+                elif 25 < users[user_id]['stt'][stat]['num'] < 75:
+                    txt += f'{stat}: средне\n'
+                else:
+                    txt += f'{stat}: мало\n'
+
+            return txt
+
 
 
 energetic = DrinksClass('энергетик', 2, 40)

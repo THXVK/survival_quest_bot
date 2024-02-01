@@ -22,7 +22,8 @@ def up_time(user_id: str, time_to: list):
     for stt in users[user_id]['stt']:
         if users[user_id]['stt'][stt]['num'] < 0:
             users[user_id]['stt'][stt]['num'] = 0
-
+        elif users[user_id]['stt'][stt]['num'] > 100:
+            users[user_id]['stt'][stt]['num'] = 100
         param = users[user_id]['stt'][stt]['num']
 
         if param > 25:
@@ -90,7 +91,6 @@ def new_temperature(user_id):
 
     if users[user_id]['time']['days_num'] in [5, 10, 20, 25, 27]:
         users[user_id]['temp']['world_temp'] -= 5.0
-
 
     def count_koef(equip):
         koef_equip = 1
