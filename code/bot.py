@@ -299,17 +299,16 @@ def inv_navigation(call) -> None:
                 if pages_list[page] == item.name:
                     txt = item.use(user_id)
                     if txt:
-                        users = user_load()
-
                         page = 0
-                        user_save(users)
                         bot.send_message(m_id, text=txt)
                     else:
                         bot.send_message(m_id, text='вы не можете использовать этот предмет')
 
                     if pages_num >= 0:
                         cur_page = page + 1
+                        users = user_load()
                         pages_num = len(users[user_id]['inv'])
+                        user_save(users)
                         inv_markup = InlineKeyboardMarkup()
                         button_1_2 = InlineKeyboardButton('<-', callback_data=f'back_{page}_{pages_num}_nav')
                         button_1_1 = InlineKeyboardButton('скрыть', callback_data=f'unseen_{page}_{pages_num}_nav')
@@ -483,10 +482,10 @@ def scouting(call) -> None:
 
     try:
         bot.delete_message(m_id, call.message.message_id)
-    except TimeoutError:
+    except Exception:
         pass
 
-    up_time(user_id, [1, 0])
+    up_time(user_id, [4, 30])
 
     txt = 'вы исследуете локацию'
     load_message = bot.send_message(m_id, text=txt)

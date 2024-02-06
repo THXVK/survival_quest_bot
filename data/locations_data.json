@@ -23,7 +23,7 @@
     ],
     "description": "Ваша квартира. Из полезного осталось лишь немного еды",
     "loc_temp": -4.3,
-    "path": "\\../pictures/img_2.png"
+    "path": "../pictures/img_2.png"
   },
   "здания": {
     "name": "здания",

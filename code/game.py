@@ -116,27 +116,30 @@ def new_temperature(user_id):
     total_temp = user_total_temp + total_world_temp
     users[user_id]['temperature'] = total_world_temp
 
-    if total_temp > 5:
-        users[user_id]['state']['гипотермия']['is_true'] = False
-        users[user_id]['state']['гипотермия']['streak'] = 0
+    if users[user_id]['time']['days_num'] == 1:
+        pass
     else:
-        states = states_load()
-        users[user_id]['state']['в норме']['is_true'] = False
-        users[user_id]['state']['гипотермия']['is_true'] = True
-        users[user_id]['state']['гипотермия']['streak'] = 1
-
-        if users[user_id]['state']['гипотермия']['streak'] >= states['гипотермия']['max_state_streak']:
-            users[user_id]['status'] = states['гипотермия']['effect_1']
-            new_state = states['гипотермия']['effect_2']
-            users[user_id]['state'][new_state]['is_true'] = True
+        if total_temp > 5:
             users[user_id]['state']['гипотермия']['is_true'] = False
+            users[user_id]['state']['гипотермия']['streak'] = 0
         else:
-            users[user_id]['state']['гипотермия']['streak'] += 1
-
-        if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
-            users[user_id]['state']['в норме']['is_true'] = True
-        else:
+            states = states_load()
             users[user_id]['state']['в норме']['is_true'] = False
+            users[user_id]['state']['гипотермия']['is_true'] = True
+            users[user_id]['state']['гипотермия']['streak'] = 1
+
+            if users[user_id]['state']['гипотермия']['streak'] >= states['гипотермия']['max_state_streak']:
+                users[user_id]['status'] = states['гипотермия']['effect_1']
+                new_state = states['гипотермия']['effect_2']
+                users[user_id]['state'][new_state]['is_true'] = True
+                users[user_id]['state']['гипотермия']['is_true'] = False
+            else:
+                users[user_id]['state']['гипотермия']['streak'] += 1
+
+            if len(users[user_id]['state']) == 0 and users[user_id]['status'] != 'мертв':
+                users[user_id]['state']['в норме']['is_true'] = True
+            else:
+                users[user_id]['state']['в норме']['is_true'] = False
 
     user_save(users)
 

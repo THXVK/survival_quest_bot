@@ -67,10 +67,11 @@ class LocationsClass:
         self.loc_temp = loc_temp
         self.path = path
 
+
 wood = LocationsClass('лес', ['дорога'],
                       [5, 0], "Лес. Здесь довольно холодно", -5.2, '../pictures/img_1.png')
 beginning = LocationsClass('дом', ['здания'], [1, 30],
-                           'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, '\../pictures/img_2.png')
+                           'Ваша квартира. Из полезного осталось лишь немного еды', -4.3, '../pictures/img_2.png')
 buildings = LocationsClass('здания', ['торговый центр', 'дом', 'дорога'], [1, 0]
                            , 'Десяток порушеных зданий. Может в них еще что-то осталось?', -7.6, '../pictures/img.png')
 road = LocationsClass('дорога', ['здания', 'деревня', 'лес'], [7, 0],
@@ -154,6 +155,10 @@ class FoodClass(ItemsClass):
                 users[user_id]['temp']['self_temp'] += 0.4
             users[user_id]['inv'].remove(self.name)
 
+            for stt in users[user_id]['stt']:
+                if users[user_id]['stt'][stt]['num'] > 100:
+                    users[user_id]['stt'][stt]['num'] = 100
+
             txt = f'вы использовали предмет: {self.name}\n'
             for stat in users[user_id]['stt']:
                 if users[user_id]['stt'][stat]['num'] >= 75:
@@ -164,7 +169,9 @@ class FoodClass(ItemsClass):
                     txt += f'{stat}: мало\n'
             user_save(users)
             return txt
-
+        else:
+            user_save(users)
+            return None
 
 
 soup = FoodClass('суп из опилок', 0.5, 20, 5)
@@ -183,6 +190,8 @@ class DrinksClass(ItemsClass):
         users = user_load()
         if users[user_id]['stt']['жажда']['num'] < 100:
             users[user_id]['stt']['жажда']['num'] += self.drink_koef
+            if users[user_id]['stt']['жажда']['num'] > 100:
+                users[user_id]['stt']['жажда']['num'] = 100
             if self.name == 'энергетик':
                 users[user_id]['stt']['стамина']['num'] += 10
             users[user_id]['inv'].remove(self.name)
@@ -196,8 +205,10 @@ class DrinksClass(ItemsClass):
                     txt += f'{stat}: средне\n'
                 else:
                     txt += f'{stat}: мало\n'
-
             return txt
+        else:
+            user_save(users)
+            return None
 
 
 
@@ -233,7 +244,8 @@ for item in items_2:
 def loot_generation(user_id):
     users = user_load()
     for loc in users[user_id]['loot']:
-        k = random.randrange(0, len(items_list) - 1)
-        names = random.choices(items_list, k=k)
-        users[user_id]['loot'][loc] += names
+        if loc not in ['лес', 'дорога']:
+            k = random.randrange(0, len(items_list) - 1)
+            names = random.choices(items_list, k=k)
+            users[user_id]['loot'][loc] += names
     user_save(users)
